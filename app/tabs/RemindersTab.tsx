@@ -1,38 +1,48 @@
-import React, { useEffect } from 'react';
+
+import React from 'react';
 import { View, Text, Button, StyleSheet } from 'react-native';
 import * as Notifications from 'expo-notifications';
 
 export default function RemindersTab() {
-  useEffect(() => {
-    // Ask for permissions to receive notifications (for iOS)
-    const requestPermissions = async () => {
-      const { status } = await Notifications.requestPermissionsAsync();
-      if (status !== 'granted') {
-        alert('You need to enable permissions in settings.');
-      }
-    };
-    requestPermissions();
-  }, []);
-
+    React.useEffect(() => {
+        const requestPermissions = async () => {
+          const { status } = await Notifications.requestPermissionsAsync();
+          if (status !== "granted") {
+            alert("Permission to send notifications is required!");
+          }
+        };
+    
+        requestPermissions();
+      }, []);
+    
+      Notifications.setNotificationHandler({
+        handleNotification: async () => ({
+          shouldShowAlert: true,
+          shouldPlaySound: false,
+          shouldSetBadge: false,
+        }),
+      });
   const scheduleNotification = async () => {
     // Schedule a local notification 5 seconds from now
     await Notifications.scheduleNotificationAsync({
       content: {
-        title: 'Time to build your habit!',
-        body: "Don't forget to log your progress today!",
+        title: 'Reminder',
+        body: "Don't forget to work on your goals today!",
       },
-      trigger: {
-        seconds: 5,    // Set the trigger to 5 seconds from now
-        repeats: false, // Set to true if you want the notification to repeat
-      },
+      trigger: { 
+        hour: 16,
+        minute: 0,
+        //seconds: 13, 
+        repeats: true, 
+    } as Notifications.NotificationTriggerInput,
     });
-    alert('Notification scheduled for 5 seconds from now.');
+    alert('Daily reminder set for 16:00 AM!');
   };
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Set Reminders</Text>
-      <Button title="Schedule Notification" onPress={scheduleNotification} />
+      <Button title="Set Daily Reminder" onPress={scheduleNotification} />
     </View>
   );
 }
